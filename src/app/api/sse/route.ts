@@ -1,6 +1,84 @@
-import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { mockAnomalies } from '../anomalies/mock-data'
+import { THREAT_LEVELS, API_DELAYS } from '@shared/config/constants'
+import type { ThreatLevel } from '@entities/anomaly/model/types'
 
-export async function GET() {
-  return new NextResponse(null, { status: 200 })
+const THREAT_LEVELS_ARRAY: ThreatLevel[] = [
+  THREAT_LEVELS.LOW,
+  THREAT_LEVELS.MEDIUM,
+  THREAT_LEVELS.HIGH,
+  THREAT_LEVELS.CRITICAL,
+]
+
+function getRandomThreatLevel(): ThreatLevel {
+  return THREAT_LEVELS_ARRAY[
+    Math.floor(Math.random() * THREAT_LEVELS_ARRAY.length)
+  ]
 }
 
+function getRandomAnomalyId(): number {
+  const activeAnomalies = mockAnomalies.filter((a) => a.status === 'Active')
+  if (activeAnomalies.length === 0) return 0
+
+  const randomAnomaly =
+    activeAnomalies[Math.floor(Math.random() * activeAnomalies.length)]
+  return randomAnomaly.id
+}
+
+export async function GET(request: NextRequest) {
+  const encoder = new TextEncoder()
+
+  const stream = new ReadableStream({
+    start(controller) {
+      const intervalId = setInterval(() => {
+        try {
+          const anomalyId = getRandomAnomalyId()
+
+          if (anomalyId === 0) {
+            return
+          }
+
+          const anomalyIndex = mockAnomalies.findIndex((a) => a.id === anomalyId)
+
+          if (anomalyIndex === -1) {
+            return
+          }
+
+          const newThreat = getRandomThreatLevel()
+
+          // Обновляем threat в mock-data
+          mockAnomalies[anomalyIndex] = {
+            ...mockAnomalies[anomalyIndex],
+            threat: newThreat,
+          }
+
+          const data = {
+            id: anomalyId,
+            threat: newThreat,
+          }
+
+          const message = `data: ${JSON.stringify(data)}\n\n`
+          controller.enqueue(encoder.encode(message))
+        } catch (error) {
+          console.error('SSE error:', error)
+          clearInterval(intervalId)
+          controller.close()
+        }
+      }, API_DELAYS.SSE_INTERVAL)
+
+      // Cleanup on close
+      request.signal.addEventListener('abort', () => {
+        clearInterval(intervalId)
+        controller.close()
+      })
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  })
+}

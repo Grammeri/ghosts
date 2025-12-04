@@ -1,10 +1,12 @@
 import React from 'react'
-import { useAnomalies } from '@entities/anomaly/api/anomaly-queries'
+import { useAnomalies, useAnomaliesStream } from '@entities/anomaly/api/anomaly-queries'
 import { AnomalyCard } from '@entities/anomaly/ui/AnomalyCard/AnomalyCard'
 import styles from './AnomaliesList.module.scss'
 
 export const AnomaliesList: React.FC = () => {
   const { data, isLoading, error } = useAnomalies()
+
+  useAnomaliesStream()
 
   if (isLoading) {
     return <div className={styles.loading}>Loading anomalies...</div>
