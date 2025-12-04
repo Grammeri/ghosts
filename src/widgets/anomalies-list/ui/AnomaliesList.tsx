@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useAnomalies,
   useAnomaliesStream,
@@ -8,7 +9,10 @@ import {
 import { AnomalyCard } from "@entities/anomaly/ui/AnomalyCard/AnomalyCard";
 import { Notification } from "@shared/ui/Notification/Notification";
 import { VictoryModal } from "@widgets/victory-modal/ui/VictoryModal";
+import { AnomaliesListSkeleton } from "./AnomaliesListSkeleton";
 import { STATUS } from "@shared/config/constants";
+import { queryKeys } from "@shared/config/query-keys";
+import type { Anomaly } from "@entities/anomaly/model/types";
 import confetti from "canvas-confetti";
 import styles from "./AnomaliesList.module.scss";
 
@@ -20,24 +24,36 @@ interface NotificationState {
 
 export const AnomaliesList: React.FC = () => {
   const { data, isLoading, error } = useAnomalies();
+  const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState<NotificationState[]>([]);
   const [victoryShown, setVictoryShown] = useState(false);
-  const [victoryWasShown, setVictoryWasShown] = useState(false);
+  const previousCapturedCountRef = useRef<number | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useAnomaliesStream();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const anomalies = data ?? [];
 
-  const allCaptured =
-    anomalies.length > 0 &&
-    anomalies.every((a) => a.status === STATUS.CAPTURED);
+  const capturedCount = anomalies.filter(
+    (a) => a.status === STATUS.CAPTURED
+  ).length;
+  const totalCount = anomalies.length;
+  const allCaptured = totalCount > 0 && capturedCount === totalCount;
 
   useEffect(() => {
-    if (allCaptured && !victoryWasShown) {
-      setVictoryShown(true);
-      setVictoryWasShown(true);
+    if (!mounted || isLoading || totalCount === 0) return;
+
+    if (previousCapturedCountRef.current === null) {
+      previousCapturedCountRef.current = capturedCount;
+      return;
     }
-  }, [allCaptured, victoryWasShown]);
+
+    previousCapturedCountRef.current = capturedCount;
+  }, [capturedCount, totalCount, mounted, isLoading]);
 
   useEffect(() => {
     if (victoryShown) {
@@ -64,27 +80,46 @@ export const AnomaliesList: React.FC = () => {
     }, 5000);
   }, []);
 
-  const handleSuccess = useCallback((message: string) => {
-    const newNotification: NotificationState = {
-      message,
-      type: "success",
-      id: Date.now(),
-    };
-    setNotifications((prev) => [...prev, newNotification]);
+  const handleSuccess = useCallback(
+    (message: string) => {
+      const newNotification: NotificationState = {
+        message,
+        type: "success",
+        id: Date.now(),
+      };
+      setNotifications((prev) => [...prev, newNotification]);
 
-    setTimeout(() => {
-      setNotifications((prev) =>
-        prev.filter((notif) => notif.id !== newNotification.id)
-      );
-    }, 3000);
-  }, []);
+      setTimeout(() => {
+        setNotifications((prev) =>
+          prev.filter((notif) => notif.id !== newNotification.id)
+        );
+      }, 3000);
+
+      setTimeout(() => {
+        const currentAnomalies = queryClient.getQueryData<Anomaly[]>(
+          queryKeys.anomalies.list()
+        );
+
+        if (!currentAnomalies) return;
+
+        const allNowCaptured =
+          currentAnomalies.length > 0 &&
+          currentAnomalies.every((a) => a.status === STATUS.CAPTURED);
+
+        if (allNowCaptured) {
+          setVictoryShown(true);
+        }
+      }, 100);
+    },
+    [queryClient]
+  );
 
   const removeNotification = useCallback((id: number) => {
     setNotifications((prev) => prev.filter((notif) => notif.id !== id));
   }, []);
 
   if (isLoading) {
-    return <div className={styles.loading}>Loading anomalies...</div>;
+    return <AnomaliesListSkeleton />;
   }
 
   if (error) {
