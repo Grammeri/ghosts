@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { captureAnomaly } from '@entities/anomaly/api/anomaly-api'
 import { queryKeys } from '@shared/config/query-keys'
+import { STATUS } from '@shared/config/constants'
 import type { Anomaly } from '@entities/anomaly/model/types'
 
 export function useCaptureAnomalyMutation() {
@@ -24,7 +25,7 @@ export function useCaptureAnomalyMutation() {
           if (!old) return old
           return old.map((anomaly) =>
             anomaly.id === id
-              ? { ...anomaly, status: 'Captured' as const }
+              ? { ...anomaly, status: STATUS.CAPTURED }
               : anomaly
           )
         }

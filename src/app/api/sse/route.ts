@@ -3,6 +3,9 @@ import { mockAnomalies } from '../anomalies/mock-data'
 import { THREAT_LEVELS, API_DELAYS } from '@shared/config/constants'
 import type { ThreatLevel } from '@entities/anomaly/model/types'
 
+// Force dynamic rendering for SSE endpoint
+export const dynamic = 'force-dynamic'
+
 const THREAT_LEVELS_ARRAY: ThreatLevel[] = [
   THREAT_LEVELS.LOW,
   THREAT_LEVELS.MEDIUM,
@@ -11,17 +14,23 @@ const THREAT_LEVELS_ARRAY: ThreatLevel[] = [
 ]
 
 function getRandomThreatLevel(): ThreatLevel {
-  return THREAT_LEVELS_ARRAY[
-    Math.floor(Math.random() * THREAT_LEVELS_ARRAY.length)
-  ]
+  const randomIndex = Math.floor(Math.random() * THREAT_LEVELS_ARRAY.length)
+  const threat = THREAT_LEVELS_ARRAY[randomIndex]
+  if (!threat) {
+    return THREAT_LEVELS.LOW
+  }
+  return threat
 }
 
 function getRandomAnomalyId(): number {
   const activeAnomalies = mockAnomalies.filter((a) => a.status === 'Active')
   if (activeAnomalies.length === 0) return 0
 
-  const randomAnomaly =
-    activeAnomalies[Math.floor(Math.random() * activeAnomalies.length)]
+  const randomIndex = Math.floor(Math.random() * activeAnomalies.length)
+  const randomAnomaly = activeAnomalies[randomIndex]
+  if (!randomAnomaly) {
+    return 0
+  }
   return randomAnomaly.id
 }
 
@@ -44,11 +53,16 @@ export async function GET(request: NextRequest) {
             return
           }
 
+          const currentAnomaly = mockAnomalies[anomalyIndex]
+          if (!currentAnomaly) {
+            return
+          }
+
           const newThreat = getRandomThreatLevel()
 
           // Обновляем threat в mock-data
           mockAnomalies[anomalyIndex] = {
-            ...mockAnomalies[anomalyIndex],
+            ...currentAnomaly,
             threat: newThreat,
           }
 

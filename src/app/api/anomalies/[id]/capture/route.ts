@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { mockAnomalies } from '../mock-data'
+import { mockAnomalies } from '../../mock-data'
 import { AnomalySchema } from '@entities/anomaly/model/schema'
 import { sleep } from '@shared/lib/sleep'
 import { API_DELAYS, CAPTURE_ERROR_PROBABILITY, STATUS } from '@shared/config/constants'
@@ -25,6 +25,9 @@ export async function POST(
     }
 
     const anomaly = mockAnomalies[anomalyIndex]
+    if (!anomaly) {
+      throw new ApiError('Anomaly not found', 404)
+    }
 
     if (anomaly.status === STATUS.CAPTURED) {
       throw new ApiError('Anomaly already captured', 400)
@@ -40,7 +43,7 @@ export async function POST(
     // 4. Меняем статус → "Captured" в mock-data
     const updatedAnomaly = {
       ...anomaly,
-      status: STATUS.CAPTURED as const,
+      status: STATUS.CAPTURED,
     }
 
     mockAnomalies[anomalyIndex] = updatedAnomaly

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Providers } from '@shared/lib/providers'
-import '@shared/config/design-tokens.scss'
 import './globals.scss'
 
 export const metadata: Metadata = {

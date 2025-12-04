@@ -21,8 +21,13 @@ export async function apiClient<T>(
 
       try {
         errorData = await response.json()
-        if (errorData && typeof errorData === 'object' && 'message' in errorData) {
-          errorMessage = String(errorData.message)
+        if (errorData && typeof errorData === 'object') {
+          // Check for 'error' field first (our API format), then 'message'
+          if ('error' in errorData) {
+            errorMessage = String(errorData.error)
+          } else if ('message' in errorData) {
+            errorMessage = String(errorData.message)
+          }
         }
       } catch {
         // If JSON parsing fails, use default error message
