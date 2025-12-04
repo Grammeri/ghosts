@@ -11,14 +11,14 @@ interface AnomalyCardProps {
   onCaptureSuccess?: (message: string) => void
 }
 
-function getThreatBadgeVariant(threat: Anomaly['threat']): 'success' | 'warning' | 'danger' | 'info' {
+function getThreatBadgeVariant(threat: Anomaly['threat']): 'success' | 'warning' | 'danger' | 'error' | 'info' {
   switch (threat) {
     case THREAT_LEVELS.LOW:
       return 'success'
     case THREAT_LEVELS.MEDIUM:
       return 'warning'
     case THREAT_LEVELS.HIGH:
-      return 'danger'
+      return 'error'
     case THREAT_LEVELS.CRITICAL:
       return 'danger'
     default:

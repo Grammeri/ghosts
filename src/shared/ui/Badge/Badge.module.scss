@@ -29,6 +29,11 @@
     color: white;
   }
 
+  &.error {
+    background-color: var(--color-threat-high);
+    color: white;
+  }
+
   &.info {
     background-color: var(--color-info);
     color: white;

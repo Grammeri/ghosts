@@ -3,7 +3,7 @@ import styles from './Badge.module.scss'
 
 interface BadgeProps {
   children: React.ReactNode
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'error' | 'info'
 }
 
 export const Badge: React.FC<BadgeProps> = ({
