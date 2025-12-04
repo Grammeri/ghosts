@@ -3,7 +3,6 @@ import { mockAnomalies } from '../anomalies/mock-data'
 import { THREAT_LEVELS, API_DELAYS } from '@shared/config/constants'
 import type { ThreatLevel } from '@entities/anomaly/model/types'
 
-// Force dynamic rendering for SSE endpoint
 export const dynamic = 'force-dynamic'
 
 const THREAT_LEVELS_ARRAY: ThreatLevel[] = [
@@ -60,7 +59,6 @@ export async function GET(request: NextRequest) {
 
           const newThreat = getRandomThreatLevel()
 
-          // Обновляем threat в mock-data
           mockAnomalies[anomalyIndex] = {
             ...currentAnomaly,
             threat: newThreat,
@@ -80,7 +78,6 @@ export async function GET(request: NextRequest) {
         }
       }, API_DELAYS.SSE_INTERVAL)
 
-      // Cleanup on close
       request.signal.addEventListener('abort', () => {
         clearInterval(intervalId)
         controller.close()

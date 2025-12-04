@@ -1,61 +1,62 @@
-'use client'
+"use client";
 
-import React, { useState, useCallback } from 'react'
-import { useAnomalies, useAnomaliesStream } from '@entities/anomaly/api/anomaly-queries'
-import { AnomalyCard } from '@entities/anomaly/ui/AnomalyCard/AnomalyCard'
-import { Notification } from '@shared/ui/Notification/Notification'
-import styles from './AnomaliesList.module.scss'
+import React, { useState, useCallback } from "react";
+import {
+  useAnomalies,
+  useAnomaliesStream,
+} from "@entities/anomaly/api/anomaly-queries";
+import { AnomalyCard } from "@entities/anomaly/ui/AnomalyCard/AnomalyCard";
+import { Notification } from "@shared/ui/Notification/Notification";
+import styles from "./AnomaliesList.module.scss";
 
 interface NotificationState {
-  message: string
-  type: 'success' | 'error' | 'info'
-  id: number
+  message: string;
+  type: "success" | "error" | "info";
+  id: number;
 }
 
 export const AnomaliesList: React.FC = () => {
-  const { data, isLoading, error } = useAnomalies()
-  const [notifications, setNotifications] = useState<NotificationState[]>([])
+  const { data, isLoading, error } = useAnomalies();
+  const [notifications, setNotifications] = useState<NotificationState[]>([]);
 
-  useAnomaliesStream()
+  useAnomaliesStream();
 
   const handleError = useCallback((errorMessage: string) => {
     const newNotification: NotificationState = {
-      message: errorMessage || 'Failed to capture anomaly',
-      type: 'error',
+      message: errorMessage || "Failed to capture anomaly",
+      type: "error",
       id: Date.now(),
-    }
-    setNotifications((prev) => [...prev, newNotification])
+    };
+    setNotifications((prev) => [...prev, newNotification]);
 
-    // Auto-hide after 5 seconds
     setTimeout(() => {
       setNotifications((prev) =>
         prev.filter((notif) => notif.id !== newNotification.id)
-      )
-    }, 5000)
-  }, [])
+      );
+    }, 5000);
+  }, []);
 
   const handleSuccess = useCallback((message: string) => {
     const newNotification: NotificationState = {
       message,
-      type: 'success',
+      type: "success",
       id: Date.now(),
-    }
-    setNotifications((prev) => [...prev, newNotification])
+    };
+    setNotifications((prev) => [...prev, newNotification]);
 
-    // Auto-hide after 3 seconds
     setTimeout(() => {
       setNotifications((prev) =>
         prev.filter((notif) => notif.id !== newNotification.id)
-      )
-    }, 3000)
-  }, [])
+      );
+    }, 3000);
+  }, []);
 
   const removeNotification = useCallback((id: number) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id))
-  }, [])
+    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  }, []);
 
   if (isLoading) {
-    return <div className={styles.loading}>Loading anomalies...</div>
+    return <div className={styles.loading}>Loading anomalies...</div>;
   }
 
   if (error) {
@@ -63,13 +64,13 @@ export const AnomaliesList: React.FC = () => {
       <div className={styles.error}>
         Error loading anomalies. Please try again later.
       </div>
-    )
+    );
   }
 
-  const anomalies = data ?? []
+  const anomalies = data ?? [];
 
   if (anomalies.length === 0) {
-    return <div className={styles.empty}>No anomalies found</div>
+    return <div className={styles.empty}>No anomalies found</div>;
   }
 
   return (
@@ -98,5 +99,5 @@ export const AnomaliesList: React.FC = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};

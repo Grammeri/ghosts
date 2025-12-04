@@ -56,7 +56,6 @@ export class SSEClient {
     }
 
     this.eventSource.onopen = () => {
-      // Clear any pending reconnect timer on successful connection
       if (this.reconnectTimer) {
         clearTimeout(this.reconnectTimer)
         this.reconnectTimer = null
