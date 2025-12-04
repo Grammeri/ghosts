@@ -1,19 +1,43 @@
+@import '@shared/config/design-tokens.scss';
+
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .loading,
 .error,
 .empty {
-  padding: 2rem;
+  padding: var(--spacing-xl);
   text-align: center;
-  color: #666;
+  color: var(--color-text-light);
+  font-size: 1rem;
 }
 
 .error {
-  color: #f44336;
+  color: var(--color-danger);
+}
+
+.empty {
+  color: var(--color-text-light);
+}
+
+@media (max-width: 768px) {
+  .list {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
 }
 

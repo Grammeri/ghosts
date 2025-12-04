@@ -13,16 +13,22 @@ export const AnomaliesList: React.FC = () => {
   }
 
   if (error) {
-    return <div className={styles.error}>Error loading anomalies</div>
+    return (
+      <div className={styles.error}>
+        Error loading anomalies. Please try again later.
+      </div>
+    )
   }
 
-  if (!data || data.length === 0) {
+  const anomalies = data ?? []
+
+  if (anomalies.length === 0) {
     return <div className={styles.empty}>No anomalies found</div>
   }
 
   return (
     <div className={styles.list}>
-      {data.map((anomaly) => (
+      {anomalies.map((anomaly) => (
         <AnomalyCard key={anomaly.id} anomaly={anomaly} />
       ))}
     </div>
