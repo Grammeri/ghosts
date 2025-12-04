@@ -1,20 +1,20 @@
-import React from 'react'
-import styles from './Button.module.scss'
+import React from "react";
+import styles from "./Button.module.scss";
 
 interface ButtonProps {
-  children: React.ReactNode
-  onClick?: () => void
-  disabled?: boolean
-  variant?: 'primary' | 'secondary'
-  type?: 'button' | 'submit' | 'reset'
+  children: React.ReactNode;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
+  variant?: "primary" | "secondary";
+  type?: "button" | "submit" | "reset";
 }
 
 export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   disabled = false,
-  variant = 'primary',
-  type = 'button',
+  variant = "primary",
+  type = "button",
 }) => {
   return (
     <button
@@ -25,6 +25,5 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {children}
     </button>
-  )
-}
-
+  );
+};

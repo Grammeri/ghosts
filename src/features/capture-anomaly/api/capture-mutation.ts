@@ -33,8 +33,11 @@ export function useCaptureAnomalyMutation() {
         );
       }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.anomalies.all });
+    onSuccess: (data) => {
+      queryClient.setQueryData<Anomaly[]>(queryKeys.anomalies.list(), (old) => {
+        if (!old) return old;
+        return old.map((anomaly) => (anomaly.id === data.id ? data : anomaly));
+      });
     },
   });
 }

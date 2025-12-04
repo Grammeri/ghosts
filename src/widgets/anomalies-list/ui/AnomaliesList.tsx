@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   useAnomalies,
   useAnomaliesStream,
 } from "@entities/anomaly/api/anomaly-queries";
 import { AnomalyCard } from "@entities/anomaly/ui/AnomalyCard/AnomalyCard";
 import { Notification } from "@shared/ui/Notification/Notification";
+import { VictoryModal } from "@widgets/victory-modal/ui/VictoryModal";
+import { STATUS } from "@shared/config/constants";
+import confetti from "canvas-confetti";
 import styles from "./AnomaliesList.module.scss";
 
 interface NotificationState {
@@ -18,8 +21,33 @@ interface NotificationState {
 export const AnomaliesList: React.FC = () => {
   const { data, isLoading, error } = useAnomalies();
   const [notifications, setNotifications] = useState<NotificationState[]>([]);
+  const [victoryShown, setVictoryShown] = useState(false);
+  const [victoryWasShown, setVictoryWasShown] = useState(false);
 
   useAnomaliesStream();
+
+  const anomalies = data ?? [];
+
+  const allCaptured =
+    anomalies.length > 0 &&
+    anomalies.every((a) => a.status === STATUS.CAPTURED);
+
+  useEffect(() => {
+    if (allCaptured && !victoryWasShown) {
+      setVictoryShown(true);
+      setVictoryWasShown(true);
+    }
+  }, [allCaptured, victoryWasShown]);
+
+  useEffect(() => {
+    if (victoryShown) {
+      confetti({
+        particleCount: 200,
+        spread: 90,
+        origin: { y: 0.6 },
+      });
+    }
+  }, [victoryShown]);
 
   const handleError = useCallback((errorMessage: string) => {
     const newNotification: NotificationState = {
@@ -67,8 +95,6 @@ export const AnomaliesList: React.FC = () => {
     );
   }
 
-  const anomalies = data ?? [];
-
   if (anomalies.length === 0) {
     return <div className={styles.empty}>No anomalies found</div>;
   }
@@ -98,6 +124,13 @@ export const AnomaliesList: React.FC = () => {
           />
         ))}
       </div>
+
+      <VictoryModal
+        isOpen={victoryShown}
+        onClose={() => {
+          setVictoryShown(false);
+        }}
+      />
     </div>
   );
 };
