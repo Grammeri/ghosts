@@ -9,12 +9,15 @@ export function useCaptureAnomalyMutation() {
   return useMutation({
     mutationFn: captureAnomaly,
     onMutate: async (id: number) => {
+      // Отменяем все исходящие запросы, чтобы они не перезаписали наш optimistic update
       await queryClient.cancelQueries({ queryKey: queryKeys.anomalies.all })
 
+      // Сохраняем предыдущие данные для отката
       const previousAnomalies = queryClient.getQueryData<Anomaly[]>(
         queryKeys.anomalies.list()
       )
 
+      // Оптимистично обновляем статус
       queryClient.setQueryData<Anomaly[]>(
         queryKeys.anomalies.list(),
         (old) => {
@@ -30,6 +33,7 @@ export function useCaptureAnomalyMutation() {
       return { previousAnomalies }
     },
     onError: (_error, _id, context) => {
+      // Откатываем состояние при ошибке
       if (context?.previousAnomalies) {
         queryClient.setQueryData(
           queryKeys.anomalies.list(),
@@ -38,8 +42,8 @@ export function useCaptureAnomalyMutation() {
       }
     },
     onSettled: () => {
+      // Инвалидируем queries для синхронизации с сервером
       queryClient.invalidateQueries({ queryKey: queryKeys.anomalies.all })
     },
   })
 }
-

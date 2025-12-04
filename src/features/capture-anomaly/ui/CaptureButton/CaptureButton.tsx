@@ -1,6 +1,7 @@
 import React from 'react'
 import { useCaptureAnomalyMutation } from '../../api/capture-mutation'
 import { Button } from '@shared/ui/Button/Button'
+import { handleApiError } from '@shared/api/errors'
 import styles from './CaptureButton.module.scss'
 
 interface CaptureButtonProps {
@@ -19,21 +20,28 @@ export const CaptureButton: React.FC<CaptureButtonProps> = ({
   const handleCapture = () => {
     mutation.mutate(anomalyId, {
       onError: (error) => {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Failed to capture anomaly'
-        onError?.(errorMessage)
+        const errorMessage = handleApiError(error)
+        onError?.(errorMessage || 'Failed to capture anomaly')
       },
     })
   }
 
+  const isLoading = mutation.isPending
+  const isDisabled = isCaptured || isLoading
+
   return (
-    <Button
-      onClick={handleCapture}
-      disabled={isCaptured || mutation.isPending}
-      variant="primary"
-    >
-      {mutation.isPending ? 'Capturing...' : 'Capture'}
-    </Button>
+    <div className={styles.wrapper}>
+      <Button
+        onClick={handleCapture}
+        disabled={isDisabled}
+        variant="primary"
+        type="button"
+      >
+        {isLoading && <span className={styles.spinner} />}
+        <span className={styles.buttonText}>
+          {isLoading ? 'Capturing...' : isCaptured ? 'Captured' : 'Capture'}
+        </span>
+      </Button>
+    </div>
   )
 }
-
