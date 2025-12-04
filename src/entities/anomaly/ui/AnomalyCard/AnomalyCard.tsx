@@ -1,54 +1,52 @@
-import React from 'react'
-import type { Anomaly } from '../../model/types'
-import { Badge } from '@shared/ui/Badge/Badge'
-import { CaptureButton } from '@features/capture-anomaly/ui/CaptureButton/CaptureButton'
-import { THREAT_LEVELS, STATUS } from '@shared/config/constants'
-import styles from './AnomalyCard.module.scss'
+import React from "react";
+import type { Anomaly } from "../../model/types";
+import { Badge } from "@shared/ui/Badge/Badge";
+import { THREAT_LEVELS, STATUS } from "@shared/config/constants";
+import styles from "./AnomalyCard.module.scss";
 
 interface AnomalyCardProps {
-  anomaly: Anomaly
-  onCaptureError?: (error: string) => void
-  onCaptureSuccess?: (message: string) => void
+  anomaly: Anomaly;
+  onRenderActions?: (anomaly: Anomaly) => React.ReactNode;
 }
 
-function getThreatBadgeVariant(threat: Anomaly['threat']): 'success' | 'warning' | 'danger' | 'error' | 'info' {
+function getThreatBadgeVariant(
+  threat: Anomaly["threat"]
+): "success" | "warning" | "danger" | "error" | "info" {
   switch (threat) {
     case THREAT_LEVELS.LOW:
-      return 'success'
+      return "success";
     case THREAT_LEVELS.MEDIUM:
-      return 'warning'
+      return "warning";
     case THREAT_LEVELS.HIGH:
-      return 'error'
+      return "error";
     case THREAT_LEVELS.CRITICAL:
-      return 'danger'
+      return "danger";
     default:
-      return 'info'
+      return "info";
   }
 }
 
-function getThreatClass(threat: Anomaly['threat']): string {
+function getThreatClass(threat: Anomaly["threat"]): string {
   switch (threat) {
     case THREAT_LEVELS.LOW:
-      return 'threatLow'
+      return "threatLow";
     case THREAT_LEVELS.MEDIUM:
-      return 'threatMedium'
+      return "threatMedium";
     case THREAT_LEVELS.HIGH:
-      return 'threatHigh'
+      return "threatHigh";
     case THREAT_LEVELS.CRITICAL:
-      return 'threatCritical'
+      return "threatCritical";
     default:
-      return ''
+      return "";
   }
 }
 
 export const AnomalyCard: React.FC<AnomalyCardProps> = ({
   anomaly,
-  onCaptureError,
-  onCaptureSuccess,
+  onRenderActions,
 }) => {
-  const isCaptured = anomaly.status === STATUS.CAPTURED
-  const threatVariant = getThreatBadgeVariant(anomaly.threat)
-  const threatClass = getThreatClass(anomaly.threat)
+  const threatVariant = getThreatBadgeVariant(anomaly.threat);
+  const threatClass = getThreatClass(anomaly.threat);
 
   return (
     <div className={`${styles.card} ${styles[threatClass]}`}>
@@ -65,20 +63,21 @@ export const AnomalyCard: React.FC<AnomalyCardProps> = ({
 
         <div className={styles.status}>
           <span className={styles.label}>Status:</span>
-          <span className={`${styles.value} ${isCaptured ? styles.captured : styles.active}`}>
+          <span
+            className={`${styles.value} ${
+              anomaly.status === STATUS.CAPTURED
+                ? styles.captured
+                : styles.active
+            }`}
+          >
             {anomaly.status}
           </span>
         </div>
       </div>
 
-      <div className={styles.footer}>
-        <CaptureButton
-          anomalyId={anomaly.id}
-          isCaptured={isCaptured}
-          onError={onCaptureError}
-          onSuccess={onCaptureSuccess}
-        />
-      </div>
+      {onRenderActions && (
+        <div className={styles.footer}>{onRenderActions(anomaly)}</div>
+      )}
     </div>
-  )
-}
+  );
+};

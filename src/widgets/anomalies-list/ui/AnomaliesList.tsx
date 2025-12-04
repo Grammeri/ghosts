@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useAnomalies,
   useAnomaliesStream,
 } from "@entities/anomaly/api/anomaly-queries";
 import { AnomalyCard } from "@entities/anomaly/ui/AnomalyCard/AnomalyCard";
+import { CaptureButton } from "@features/capture-anomaly/ui/CaptureButton/CaptureButton";
 import { Notification } from "@shared/ui/Notification/Notification";
 import { VictoryModal } from "@widgets/victory-modal/ui/VictoryModal";
 import { AnomaliesListSkeleton } from "./AnomaliesListSkeleton";
@@ -27,33 +28,10 @@ export const AnomaliesList: React.FC = () => {
   const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState<NotificationState[]>([]);
   const [victoryShown, setVictoryShown] = useState(false);
-  const previousCapturedCountRef = useRef<number | null>(null);
-  const [mounted, setMounted] = useState(false);
 
   useAnomaliesStream();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const anomalies = data ?? [];
-
-  const capturedCount = anomalies.filter(
-    (a) => a.status === STATUS.CAPTURED
-  ).length;
-  const totalCount = anomalies.length;
-  const allCaptured = totalCount > 0 && capturedCount === totalCount;
-
-  useEffect(() => {
-    if (!mounted || isLoading || totalCount === 0) return;
-
-    if (previousCapturedCountRef.current === null) {
-      previousCapturedCountRef.current = capturedCount;
-      return;
-    }
-
-    previousCapturedCountRef.current = capturedCount;
-  }, [capturedCount, totalCount, mounted, isLoading]);
 
   useEffect(() => {
     if (victoryShown) {
@@ -154,8 +132,14 @@ export const AnomaliesList: React.FC = () => {
           <AnomalyCard
             key={anomaly.id}
             anomaly={anomaly}
-            onCaptureError={handleError}
-            onCaptureSuccess={handleSuccess}
+            onRenderActions={(a) => (
+              <CaptureButton
+                anomalyId={a.id}
+                isCaptured={a.status === STATUS.CAPTURED}
+                onError={handleError}
+                onSuccess={handleSuccess}
+              />
+            )}
           />
         ))}
       </div>

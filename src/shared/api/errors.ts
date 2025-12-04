@@ -19,3 +19,4 @@ export function handleApiError(error: unknown): string {
   return 'An unknown error occurred'
 }
 
+
