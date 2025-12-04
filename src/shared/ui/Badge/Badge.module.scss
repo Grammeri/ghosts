@@ -1,33 +1,38 @@
+@import '@shared/config/design-tokens.scss';
+
 .badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 
   &.default {
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: var(--color-border-light);
+    color: var(--color-text);
   }
 
   &.success {
-    background-color: #4caf50;
+    background-color: var(--color-threat-low);
     color: white;
   }
 
   &.warning {
-    background-color: #ff9800;
+    background-color: var(--color-threat-medium);
     color: white;
   }
 
   &.danger {
-    background-color: #f44336;
+    background-color: var(--color-threat-critical);
     color: white;
   }
 
   &.info {
-    background-color: #2196f3;
+    background-color: var(--color-info);
     color: white;
   }
 }
-

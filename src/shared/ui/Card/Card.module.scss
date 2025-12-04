@@ -1,7 +1,14 @@
-.card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-}
+@import '@shared/config/design-tokens.scss';
 
+.card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+  }
+}

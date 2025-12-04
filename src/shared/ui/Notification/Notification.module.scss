@@ -1,24 +1,29 @@
+@import '@shared/config/design-tokens.scss';
+
 .notification {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 300px;
+  max-width: 100%;
+  animation: slideIn 0.3s var(--transition-base);
+  transition: opacity var(--transition-base), transform var(--transition-base);
 
   &.success {
-    background-color: #4caf50;
+    background-color: var(--color-success);
     color: white;
   }
 
   &.error {
-    background-color: #f44336;
+    background-color: var(--color-danger);
     color: white;
   }
 
   &.info {
-    background-color: #2196f3;
+    background-color: var(--color-info);
     color: white;
   }
 
@@ -29,8 +34,25 @@
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
-    margin-left: 1rem;
+    margin-left: var(--spacing-md);
     line-height: 1;
+    opacity: 0.8;
+    transition: opacity var(--transition-fast);
+    flex-shrink: 0;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

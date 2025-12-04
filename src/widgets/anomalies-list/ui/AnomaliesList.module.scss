@@ -1,13 +1,28 @@
 @import '@shared/config/design-tokens.scss';
 
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.notifications {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 400px;
+}
+
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
 }
 
 .loading,
@@ -28,6 +43,13 @@
 }
 
 @media (max-width: 768px) {
+  .notifications {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    left: var(--spacing-md);
+    max-width: none;
+  }
+
   .list {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
@@ -38,6 +60,34 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .list {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+  .list {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+  }
+}
+
+@media (min-width: 1201px) {
+  .list {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 360px) {
+  .list {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+
+  .notifications {
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    left: var(--spacing-sm);
   }
 }
 

@@ -8,12 +8,14 @@ interface CaptureButtonProps {
   anomalyId: number
   isCaptured: boolean
   onError?: (error: string) => void
+  onSuccess?: (message: string) => void
 }
 
 export const CaptureButton: React.FC<CaptureButtonProps> = ({
   anomalyId,
   isCaptured,
   onError,
+  onSuccess,
 }) => {
   const mutation = useCaptureAnomalyMutation()
 
@@ -22,6 +24,9 @@ export const CaptureButton: React.FC<CaptureButtonProps> = ({
       onError: (error) => {
         const errorMessage = handleApiError(error)
         onError?.(errorMessage || 'Failed to capture anomaly')
+      },
+      onSuccess: () => {
+        onSuccess?.('Anomaly captured successfully')
       },
     })
   }

@@ -7,6 +7,8 @@ import styles from './AnomalyCard.module.scss'
 
 interface AnomalyCardProps {
   anomaly: Anomaly
+  onCaptureError?: (error: string) => void
+  onCaptureSuccess?: (message: string) => void
 }
 
 function getThreatBadgeVariant(threat: Anomaly['threat']): 'success' | 'warning' | 'danger' | 'info' {
@@ -39,7 +41,11 @@ function getThreatClass(threat: Anomaly['threat']): string {
   }
 }
 
-export const AnomalyCard: React.FC<AnomalyCardProps> = ({ anomaly }) => {
+export const AnomalyCard: React.FC<AnomalyCardProps> = ({
+  anomaly,
+  onCaptureError,
+  onCaptureSuccess,
+}) => {
   const isCaptured = anomaly.status === STATUS.CAPTURED
   const threatVariant = getThreatBadgeVariant(anomaly.threat)
   const threatClass = getThreatClass(anomaly.threat)
@@ -69,6 +75,8 @@ export const AnomalyCard: React.FC<AnomalyCardProps> = ({ anomaly }) => {
         <CaptureButton
           anomalyId={anomaly.id}
           isCaptured={isCaptured}
+          onError={onCaptureError}
+          onSuccess={onCaptureSuccess}
         />
       </div>
     </div>
