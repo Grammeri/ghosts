@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { useAnomalies, useAnomaliesStream } from '@entities/anomaly/api/anomaly-queries'
 import { AnomalyCard } from '@entities/anomaly/ui/AnomalyCard/AnomalyCard'
