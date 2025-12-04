@@ -1,5 +1,6 @@
 import { apiClient } from '@shared/api/client'
-import { AnomaliesArraySchema, AnomalySchema, type Anomaly } from '../model/schema'
+import { AnomaliesArraySchema, AnomalySchema } from '../model/schema'
+import type { Anomaly } from '../model/types'
 
 export async function getAnomalies(): Promise<Anomaly[]> {
   const data = await apiClient<Anomaly[]>(
