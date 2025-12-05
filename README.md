@@ -1,52 +1,100 @@
 # Yokai Monitor
 
-Real-time anomaly monitoring dashboard for tracking spirits (yokai) across Tokyo. Built with Next.js 14, Feature-Sliced Design architecture, TanStack Query, and SCSS Modules.
+Real-time anomaly monitoring dashboard for tracking spirits (yokai) across Tokyo.  
+Built with **Next.js 14**, **Feature-Sliced Design**, **TanStack Query**, **Zod**, **SSE**, and **SCSS Modules**.  
+Fully Dockerized.
+
+---
+
+# ⚡ Quick Start
+
+```bash
+git clone <your-repo-url>
+npm install
+npm run dev
+```
+
+Open in browser:
+
+👉 http://localhost:3000/monitoring
 
 ## 🎯 Project Overview
 
-This is a SPA built on Next.js 14 for monitoring yokai (spirits). The application provides real-time updates through Server-Sent Events (SSE), optimistic UI updates when capturing spirits, and follows a strict Feature-Sliced Design (FSD) architecture. The project uses SCSS Modules for styling, Zod for validation, TanStack Query for data management, and includes full Docker support.
+This SPA monitors spiritual anomalies (yokai) across Tokyo in real time.
 
-The organization is dedicated to tracking spirits in Tokyo. Operators use this dashboard to capture anomalies in real-time, monitoring threat levels and managing the status of each spirit across different locations in the city.
+Operators use the dashboard to track threat levels, capture spirits, and react to sudden fluctuations of spiritual energy.
 
-## 🟣 How the app works (important behavior)
+The app includes:
 
-Each spirit has the following parameters: **name, location, threat level, and status**.
+- Real-time updates via SSE
+- Optimistic UI updates when capturing
+- Strict Feature-Sliced Design architecture
+- SCSS Modules + TypeScript
+- Full Docker support
+- Validated data via Zod
 
-When clicking the **Capture** button:
+**Note:**  
+Mock backend, in-memory state, and simplified SSE simulation are intentional — required by the assignment.  
+Architecture follows production-grade principles.
 
-- The interface updates instantly (optimistic update)
-- There is a 30% chance of receiving an error
-- If an error occurs, the UI rolls back to the previous state
+## 🟣 How the app works (core behavior)
 
-If a spirit becomes **captured**, it remains captured **forever**.
+Every spirit has: **name, location, threat level, status**.
 
-However, the **threat level continues to change every 5 seconds — even though the spirit is already captured**.  
-This simulates ongoing environmental spiritual energy fluctuations.
+### ➤ Capture Logic
 
-When **all spirits become captured**, a **Victory Modal** appears with confetti animation.
+When clicking **Capture**:
 
-After closing the modal, the application continues operating normally — threat levels still update in real time.
+- UI updates immediately (optimistic update)
+- 30% chance of error ("Capture failed")
+- On error → rollback
+- On success → spirit becomes **Captured forever**
+
+### ➤ Real-time Threat Updates
+
+Even after capture:
+
+- Threat level continues changing every 5 seconds
+- UI receives updates via SSE automatically
+- No reload needed
+
+### ➤ Victory Modal
+
+When all spirits are captured:
+
+- A Victory Modal appears
+- Confetti animation triggers
+- After closing, app continues working normally
 
 ## 📡 Real-Time Engine (SSE)
 
-The application uses Server-Sent Events (SSE) through the `/api/sse` endpoint:
+The `/api/sse` endpoint pushes updates every 5 seconds:
 
-- Every 5 seconds, a random spirit's threat level is updated
-- Updates apply **even to captured spirits**
-- UI reacts instantly via React Query cache invalidation and subscription
-- No page reload is needed
+- A random spirit gets a new threat level
+- React Query automatically updates cached data
+- UI reflects changes instantly
 
-## 🧱 Architecture (FSD)
+Captured spirits also receive threat updates (status does not change).
 
-The project follows Feature-Sliced Design (FSD) architecture with strict slicing rules.
+## 🔄 Data Persistence Note
+
+The project stores anomaly data in `globalThis` memory.
+
+This means:
+
+- Data resets when the server restarts
+- Capture results are not persistent
+- This is expected and intentional for mock-based architecture
+
+## 🧱 Architecture (Feature-Sliced Design)
 
 ```
 src/
-  app/        # Next.js App Router (routes, API handlers)
-  widgets/    # Composite UI blocks
-  features/   # Business logic units
-  entities/   # Domain entities
-  shared/     # Shared utilities, UI components, constants
+  app/        # Next.js App Router, pages, API routes
+  widgets/    # Complex UI blocks
+  features/   # Business actions / logic
+  entities/   # Domain entities (Anomaly)
+  shared/     # UI kit, utils, config, constants
 ```
 
 ### Import Rules (strict)
@@ -57,34 +105,20 @@ src/
 - `entities` → shared
 - `shared` → only shared
 
-No upward imports allowed.  
-This keeps the project maintainable and predictable.
+No circular imports, no upward imports. Clean architecture guaranteed.
 
-## 🚀 Installation
+## 🚀 Installation & Scripts
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Setup
-
-1. Install dependencies:
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-2. Run development server:
+### Development mode
 
 ```bash
 npm run dev
-```
-
-3. Visit:
-
-```
-http://localhost:3000/monitoring
 ```
 
 ### Production build
@@ -94,55 +128,57 @@ npm run build
 npm start
 ```
 
+Open:
+
+👉 http://localhost:3000/monitoring
+
 ## 🐳 Docker Usage
 
-### Build image
+### Build the image
 
 ```bash
 docker-compose build --no-cache
 ```
 
-### Run container
+### Start container
 
 ```bash
 docker-compose up -d
 ```
 
-### Access the app
-
-👉 **http://localhost:3000/monitoring**
-
-### Stop container
+### Stop
 
 ```bash
 docker-compose down
 ```
 
-## 🧪 API Simulation (Mocks)
+Service runs at:
 
-Mock API handlers simulate backend behavior.
+👉 http://localhost:3000/monitoring
+
+## 🧪 API Simulation (Mocks)
 
 ### GET /api/anomalies
 
-Returns all anomalies.
+Return list of all spirits.
 
 ### POST /api/anomalies/[id]/capture
 
-Attempts to capture the anomaly.  
+Attempts to capture the spirit.  
 30% chance of failure.
 
 ### GET /api/sse
 
-Streams threat-level updates every 5 seconds.
+Streams threat updates every 5 seconds.
 
-## 🧨 Technologies
+## 🧨 Technologies Used
 
 - **Next.js 14** (App Router)
 - **React 18**
-- **TanStack Query** (async state)
-- **Zod** (schema validation)
-- **SCSS Modules** (styling)
-- **SSE** (real time)
+- **TanStack Query**
+- **Zod** (validation)
+- **SCSS Modules**
+- **SSE**
 - **Docker**
 - **Feature-Sliced Design**
 - **canvas-confetti**
