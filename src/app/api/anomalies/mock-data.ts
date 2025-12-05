@@ -1,7 +1,7 @@
 import type { Anomaly } from '@entities/anomaly/model/types'
 import { STATUS, THREAT_LEVELS } from '@shared/config/constants'
 
-export const mockAnomalies: Anomaly[] = [
+const DEFAULT_DATA: Anomaly[] = [
   {
     id: 1,
     name: 'Kitsune',
@@ -52,3 +52,9 @@ export const mockAnomalies: Anomaly[] = [
     status: STATUS.ACTIVE,
   },
 ]
+
+if (!(globalThis as any)._mockAnomalies) {
+  ;(globalThis as any)._mockAnomalies = [...DEFAULT_DATA]
+}
+
+export const mockAnomalies = (globalThis as any)._mockAnomalies as Anomaly[]
